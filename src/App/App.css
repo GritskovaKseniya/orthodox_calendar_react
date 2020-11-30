@@ -36,3 +36,19 @@
     transform: rotate(360deg);
   }
 }
+
+/* TODO: Вынести в отдельный css файл */
+.App button {
+  color: black;
+}
+
+.App .react-calendar {
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 15px;
+}
+
+.App img {
+  display: block;
+  margin: 0 auto;
+}
