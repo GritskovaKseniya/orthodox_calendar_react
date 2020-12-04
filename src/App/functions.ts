@@ -38,13 +38,19 @@ export async function getData(date: Date):Promise<calendarData> {
                 data.texts = json.texts[0].text
                 
                 if (json.holidays instanceof Array) {
-                    let holydaysIconUrls: string[] = [];
+                    let holidaysIconUrls: string[] = [];
                     json.holidays.forEach(
-                        holiday => holiday.imgs.forEach(
-                            img => holydaysIconUrls.push(
-                                `${baseAzbykaAssetesURL}/holidays/${img.holiday_id}/${img.image}`
-                    )));
-                    data.iconUrls = data.iconUrls.concat(holydaysIconUrls);
+                        holiday => {
+                            if (holiday.imgs){
+                                holiday.imgs.forEach(
+                                    img => holidaysIconUrls.push(
+                                        `${baseAzbykaAssetesURL}/holidays/${img.holiday_id}/${img.image}`
+                                    )
+                                )
+                            }
+                        }
+                    );
+                    data.iconUrls = data.iconUrls.concat(holidaysIconUrls);
                 }
 
                 if (json.saints instanceof Array) {

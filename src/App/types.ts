@@ -36,5 +36,5 @@ export interface azbykaDaysResponse {
             holiday_id: number;
             image: string;
         }[]
-    }[] | { item: ''; };
+    }[] | null;
 }
