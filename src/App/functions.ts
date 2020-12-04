@@ -19,9 +19,11 @@ export async function getData(date: Date):Promise<calendarData> {
     let data: calendarData = {
         texts: '',
         saints: [],
+        iconUrls: [],
+        liturgicalInstructions: '',
     };
 
-    const HTMLTagsRegExp = new RegExp('</?[A-Za-z]+>', 'g')
+    const HTMLTagsRegExp = new RegExp('</?.*>', 'g')
 
     await Promise.allSettled([
         fetch(`${baseAzbykaAPIURL}/day/${formatDate(date)}.json`)
@@ -34,29 +36,58 @@ export async function getData(date: Date):Promise<calendarData> {
             })
             .then((json: azbykaDaysResponse) => {
                 data.texts = json.texts[0].text
+                
+                if (json.holidays instanceof Array) {
+                    let holydaysIconUrls: string[] = [];
+                    json.holidays.forEach(
+                        holiday => holiday.imgs.forEach(
+                            img => holydaysIconUrls.push(
+                                `${baseAzbykaAssetesURL}/holidays/${img.holiday_id}/${img.image}`
+                    )));
+                    data.iconUrls = data.iconUrls.concat(holydaysIconUrls);
+                }
+
                 if (json.saints instanceof Array) {
-                    data.saintIconUrl = `${baseAzbykaAssetesURL}/saints/${json.saints[0].id}/${json.saints[0].imgs[0].image}`
-                    data.saints = json.saints.map(saint => (saint.type_of_sanctity
+                    let saintIconUrls: string[] = [];
+                    json.saints.forEach(
+                        saint => saint.imgs.forEach(
+                            img => saintIconUrls.push(
+                                `${baseAzbykaAssetesURL}/saints/${img.saint_id}/${img.image}`
+                    )));
+                    data.iconUrls = data.iconUrls.concat(saintIconUrls);
+
+                    data.saints = json.saints.map(saint => (
+                        saint.prefix
+                            + (saint.type_of_sanctity ? saint.type_of_sanctity : '')
                             + ' '
                             + saint.title_genitive
                             + ', '
                             + (saint.church_title_genitive ? saint.church_title_genitive : '')
                             + saint.suffix)
                         .replaceAll(HTMLTagsRegExp, '')
-                    )
+                    );
                 }
-                
+
+                if (json.ikons instanceof Array) {
+                    let iconIconUrls: string[] = [];
+                    json.ikons.forEach(
+                        icon => icon.imgs.forEach(
+                            img => iconIconUrls.push(
+                                `${baseAzbykaAssetesURL}/icons/${img.icon_of_our_lady_id}/${img.img}`
+                    )));
+                    data.iconUrls = data.iconUrls.concat(iconIconUrls);
+                }
             })
             .catch(console.log),
         fetch(`http://${window.location.hostname}:8080/wp-content/get-bu.php?date=${formatDate(date)}`)
             .then((resp: Response) => {
                 if (resp.ok) {
-                    return resp.json()
+                    return resp.json();
                 } else {
-                    Promise.reject()
+                    Promise.reject();
                 }
             })
-            .then(json => data.liturgicalInstructions = json.data)
+            .then(json => data.liturgicalInstructions = json.data.replaceAll('\n', '<br />'))
             .catch(console.log)
     ])
 
