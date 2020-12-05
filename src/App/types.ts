@@ -35,6 +35,6 @@ export interface azbykaDaysResponse {
         imgs: {
             holiday_id: number;
             image: string;
-        }[]
-    }[] | null;
+        }[] | null;
+    }[];
 }

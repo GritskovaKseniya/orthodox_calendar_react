@@ -85,7 +85,7 @@ export async function getData(date: Date):Promise<calendarData> {
                 }
             })
             .catch(console.log),
-        fetch(`http://${window.location.hostname}:8080/wp-content/get-bu.php?date=${formatDate(date)}`)
+        fetch(`http://${window.location.hostname}/wp/wp-content/2020/zolotukhin/get-bu.php?date=${formatDate(date)}`)
             .then((resp: Response) => {
                 if (resp.ok) {
                     return resp.json();
