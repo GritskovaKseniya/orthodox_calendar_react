@@ -30,7 +30,7 @@ function App(): JSX.Element {
     return (
         <div className='App container'>
             <div className='row'>
-                <FlagsPanel className='col' />
+                <FlagsPanel className='col-3' />
                 <Calendar className='col' value={date} onChange={(date) => setDate(date as Date)}/>
             </div>
             {
@@ -55,11 +55,11 @@ function App(): JSX.Element {
             }
             {
                 keys.includes('saints')
-                && <span>{data.saints.join('; ')}</span>
+                && <div>{data.saints.join('; ')}</div>
             }
             {
                 keys.includes('texts')
-                && <span dangerouslySetInnerHTML={{__html: data.texts}}></span>
+                && <div dangerouslySetInnerHTML={{__html: data.texts}}></div>
             }
             {
                 keys.includes('instructions')
