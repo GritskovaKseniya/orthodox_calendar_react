@@ -20,7 +20,6 @@ function App(): JSX.Element {
     const [carouselId] = useState<string>(uniqueId('react-calendar-carousel-'))
 
     const params = GETParamsAsObject()
-    const keys = Object.keys(params)
 
     useEffect(() => {
         getData(date)
@@ -34,7 +33,7 @@ function App(): JSX.Element {
                 <Calendar className='col' value={date} onChange={(date) => setDate(date as Date)}/>
             </div>
             {
-                keys.includes('ikons')
+                'ikons' in params
                 && <div className='carousel slide' data-ride='carousel' id={carouselId}>
                     <div className="carousel-inner">
                         {data.iconUrls.map((url: string, idx: number) =>
@@ -54,15 +53,15 @@ function App(): JSX.Element {
                 </div>
             }
             {
-                keys.includes('saints')
+                'saints' in params
                 && <div>{data.saints.join('; ')}</div>
             }
             {
-                keys.includes('texts')
+                'texts' in params
                 && <div dangerouslySetInnerHTML={{__html: data.texts}}></div>
             }
             {
-                keys.includes('instructions')
+                'instructions' in params
                 && <details>
                     <summary>Богослужебные указания</summary>
                     <span dangerouslySetInnerHTML={{__html: data.liturgicalInstructions}}></span>
