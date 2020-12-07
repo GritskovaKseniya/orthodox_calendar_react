@@ -4,7 +4,9 @@ import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
 import { getData } from './functions';
 import { calendarData } from './types';
-import {uniqueId} from 'lodash'
+import { uniqueId } from 'lodash'
+import { FlagsPanel } from '../FlagsPanel';
+import { GETParamsAsObject } from '../../commonFunctions';
 
 function App(): JSX.Element {
     const [date, setDate] = useState<Date>(new Date())
@@ -14,16 +16,11 @@ function App(): JSX.Element {
         iconUrls: [],
         liturgicalInstructions: '',
     });
-    // useState to ensure that carouselId will be generate only once
+    // useState to ensure that carouselId will not change after re-render
     const [carouselId] = useState<string>(uniqueId('react-calendar-carousel-'))
 
-    // Get GET-params as JS object
-    let params = JSON.parse(
-        '{"' + window.location.search.slice(1).replace(/&/g, '","').replace(/=/g,'":"') + '"}',
-        function(key, value) { return key===""?value:decodeURIComponent(value)}
-    )
-
-    let keys = Object.keys(params)
+    const params = GETParamsAsObject()
+    const keys = Object.keys(params)
 
     useEffect(() => {
         getData(date)
@@ -32,7 +29,10 @@ function App(): JSX.Element {
 
     return (
         <div className='App container'>
-            <Calendar value={date} onChange={(date) => setDate(date as Date)}/>
+            <div className='row'>
+                <FlagsPanel className='col' />
+                <Calendar className='col' value={date} onChange={(date) => setDate(date as Date)}/>
+            </div>
             {
                 keys.includes('ikons')
                 && <div className='carousel slide' data-ride='carousel' id={carouselId}>
@@ -55,7 +55,7 @@ function App(): JSX.Element {
             }
             {
                 keys.includes('saints')
-                &&   <span>{data.saints.join('; ')}</span>
+                && <span>{data.saints.join('; ')}</span>
             }
             {
                 keys.includes('texts')
