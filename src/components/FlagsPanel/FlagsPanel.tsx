@@ -1,41 +1,43 @@
-import React from 'react'
-import { GETParamsAsObject } from '../../commonFunctions'
+import React, { useState } from 'react'
+import { GETParamsAsObject } from '../../domain/functions'
+import { Flags, FlagsKeys } from '../../domain/types'
+import { Props } from './types'
 
-interface Props {
-    className?: string
-}
 const FlagsPanel: React.FC<Props> = (props: Props) => {
-     let params = GETParamsAsObject()
+    const [params, setParams] = useState<Flags>(props.initialValues)
 
-    function toggleParam(key: string) {
-        console.log(params)
-        if (key in params) {
-            delete params[key]
-        } else {
-            params[key] = ''
-        }
-        
-        const search = Object.keys(params).reduce((acc, val) => `${acc}${val}=${params[val]}&`, '?')
-        window.location.search = search.slice(0, -1)
+    function toggleParam(key: FlagsKeys) {
+        setParams({...params, [key]: !params[key]})
     }
+
+    function handleSubmit() {
+        // Order matters to rewrite old values
+        const newURLParams = { ...GETParamsAsObject(), ...params}
+        window.location.search = Object.keys(newURLParams)
+            .reduce((acc, val) => newURLParams[val] ? `${acc}${val}=${newURLParams[val]}&`: acc, '?')
+            .slice(0, -1)
+    } 
 
     return (
         <div className={props.className}>
             <div>
                 <label>Тексты</label>
-                <input type="checkbox" onChange={() => toggleParam('texts')} checked={'texts' in params} />
+                <input type="checkbox" onChange={() => toggleParam(FlagsKeys.Texts)} checked={params.texts} />
             </div>
             <div>
                 <label>Иконы</label>
-                <input type="checkbox" onChange={() => toggleParam('ikons')} checked={'ikons' in params} />
+                <input type="checkbox" onChange={() => toggleParam(FlagsKeys.Ikons)} checked={params.ikons} />
             </div>
             <div>
                 <label>Богослужебные указания</label>
-                <input type="checkbox" onChange={() => toggleParam('instructions')} checked={'instructions' in params} />
+                <input type="checkbox" onChange={() => toggleParam(FlagsKeys.Instructions)} checked={params.instructions} />
             </div>
             <div>
                 <label>Святые</label>
-                <input type="checkbox" onChange={() => toggleParam('saints')} checked={'saints' in params} />
+                <input type="checkbox" onChange={() => toggleParam(FlagsKeys.Saints)} checked={params.saints} />
+            </div>
+            <div>
+                <button className='btn btn-primary' onClick={handleSubmit}>Submit</button>
             </div>
         </div>
     )

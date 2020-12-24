@@ -6,7 +6,8 @@ import { getData } from './functions';
 import { calendarData } from './types';
 import { uniqueId } from 'lodash'
 import { FlagsPanel } from '../FlagsPanel';
-import { GETParamsAsObject } from '../../commonFunctions';
+import { GETParamsAsObject } from '../../domain/functions';
+import { Flags, FlagsKeys } from '../../domain/types';
 
 function App(): JSX.Element {
     const [date, setDate] = useState<Date>(new Date())
@@ -20,6 +21,12 @@ function App(): JSX.Element {
     const [carouselId] = useState<string>(uniqueId('react-calendar-carousel-'))
 
     const params = GETParamsAsObject()
+    const flagsValues: Flags = {
+        [FlagsKeys.Texts]: FlagsKeys.Texts in params,
+        [FlagsKeys.Ikons]: FlagsKeys.Ikons in params,
+        [FlagsKeys.Saints]: FlagsKeys.Saints in params,
+        [FlagsKeys.Instructions]: FlagsKeys.Instructions in params
+    }
 
     useEffect(() => {
         getData(date)
@@ -29,11 +36,11 @@ function App(): JSX.Element {
     return (
         <div className='App container'>
             <div className='row'>
-                <FlagsPanel className='col-3' />
+                <FlagsPanel initialValues={flagsValues} className='col-3' />
                 <Calendar className='col' value={date} onChange={(date) => setDate(date as Date)}/>
             </div>
             {
-                'ikons' in params
+                flagsValues.ikons
                 && <div className='carousel slide' data-ride='carousel' id={carouselId}>
                     <div className="carousel-inner">
                         {data.iconUrls.map((url: string, idx: number) =>
@@ -53,15 +60,15 @@ function App(): JSX.Element {
                 </div>
             }
             {
-                'saints' in params
+                flagsValues.saints
                 && <div>{data.saints.join('; ')}</div>
             }
             {
-                'texts' in params
+                flagsValues.texts
                 && <div dangerouslySetInnerHTML={{__html: data.texts}}></div>
             }
             {
-                'instructions' in params
+                flagsValues.instructions
                 && <details>
                     <summary>Богослужебные указания</summary>
                     <span dangerouslySetInnerHTML={{__html: data.liturgicalInstructions}}></span>
